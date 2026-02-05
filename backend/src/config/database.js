@@ -7,10 +7,15 @@ const config = {
     database: process.env.DB_DATABASE,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
+    
     options: {
-        encrypt: false, 
-        trustServerCertificate: true 
+        encrypt: true,  // Cambiar a true para servidores remotos
+        trustServerCertificate: true,
+        enableArithAbort: true,
+        connectionTimeout: 30000,  // 30 segundos (aumentado)
+        requestTimeout: 30000      // 30 segundos para queries
     },
+    
     pool: {
         max: 10,
         min: 0,
