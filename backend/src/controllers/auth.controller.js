@@ -21,14 +21,19 @@ const authController = {
 
       if (!user) {
         return res.status(401).json({
-          error: 'Credenciales inválidas'
+          success: false,
+          message: 'Credenciales inválidas'
         });
       }
 
       // No enviar la contraseña en la respuesta
       delete user.PASSWORD;
 
-      res.status(200).json(user);
+      res.status(200).json({
+        success: true,
+        data: user,
+        message: 'Login exitoso'
+      });
     } catch (error) {
       console.error('Error en login:', error);
       res.status(500).json({

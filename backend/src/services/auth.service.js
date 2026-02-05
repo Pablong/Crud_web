@@ -23,7 +23,7 @@ const authService = {
       
       return null;
     } catch (error) {
-      console.error('Error en validarLogin:', error);
+
       throw error;
     }
   }

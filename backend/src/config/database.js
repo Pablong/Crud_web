@@ -9,12 +9,13 @@ const config = {
     password: process.env.DB_PASSWORD,
     
     options: {
-        encrypt: true,  // Cambiar a true para servidores remotos
+        encrypt: false, 
         trustServerCertificate: true,
-        enableArithAbort: true,
-        connectionTimeout: 30000,  // 30 segundos (aumentado)
-        requestTimeout: 30000      // 30 segundos para queries
+        enableArithAbort: true
     },
+    
+    connectionTimeout: 60000,
+    requestTimeout: 60000,
     
     pool: {
         max: 10,
@@ -24,24 +25,17 @@ const config = {
 };
 
 let pool = null;
-/**
- * @returns {Promise<sql.ConnectionPool>} 
- *
- *  */
 
 async function getConnection() {
-    try{
+    try {
         if (pool && pool.connected) {
             return pool;
         }
         
-        console.log("Conectando a SQL server...");
         pool = await sql.connect(config);
-        console.log("Conexión exitosa a SQL server");
         return pool;
-
     } catch (error) {
-        console.error("Error al conectar a SQL server:", error.message);
+        pool = null;
         throw error;
     }
 }
@@ -50,10 +44,9 @@ async function closeConnection() {
     try {
         if (pool) {
             await pool.close();
-            console.log("Conexión a SQL server cerrada");
         }
     } catch (error) {
-        console.error("Error al cerrar la conexión a SQL server:", error.message);
+        throw error;
     }
 }
 

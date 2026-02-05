@@ -20,7 +20,6 @@ async function listarBodegas() {
         return result.recordset;
         
     } catch (error) {
-        console.error('Error en listarBodegas:', error);
         throw error;
     }
 }
@@ -41,7 +40,7 @@ async function obtenerBodegaPorId(idBodega) {
         return result.recordset[0] || null;
         
     } catch (error) {
-        console.error('Error en obtenerBodegaPorId:', error);
+
         throw error;
     }
 }
@@ -71,7 +70,6 @@ async function crearBodega(bodega) {
         return result.recordset[0];
         
     } catch (error) {
-        console.error('Error en crearBodega:', error);
         throw error;
     }
 }
@@ -100,7 +98,6 @@ async function actualizarBodega(idBodega, bodega) {
         return result.recordset[0];
         
     } catch (error) {
-        console.error('Error en actualizarBodega:', error);
         throw error;
     }
 }
@@ -120,7 +117,6 @@ async function eliminarBodega(idBodega, idUsuarioModi) {
         return result.recordset[0];
         
     } catch (error) {
-        console.error('Error en eliminarBodega:', error);
         throw error;
     }
 }
