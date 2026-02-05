@@ -17,7 +17,8 @@ const server = app.listen(PORT, () => {
     console.log(`📍 Puerto: ${PORT}`);
     console.log(`🌐 URL: http://localhost:${PORT}`);
     console.log(`📊 API Bodegas: http://localhost:${PORT}/api/bodegas`);
-    console.log(`🔧 Entorno: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`� API Auth: http://localhost:${PORT}/api/auth/login`);
+    console.log(`�🔧 Entorno: ${process.env.NODE_ENV || 'development'}`);
     console.log('='.repeat(50));
 });
 

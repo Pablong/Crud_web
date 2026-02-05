@@ -22,6 +22,10 @@ app.use(express.urlencoded({ extended: true }));
 const bodegaRoutes = require('./routes/bodega.routes');
 app.use('/api/bodegas', bodegaRoutes);
 
+// Rutas de autenticación
+const authRoutes = require('./routes/auth.routes');
+app.use('/api/auth', authRoutes);
+
 
 // MANEJO DE RUTAS NO ENCONTRADAS (404)
 app.use((req, res) => {

@@ -60,7 +60,7 @@ async function obtenerBodegaPorId(req, res) {
 }
 
 // =============================================
-// POST /api/bodegas - Crear nueva bodega
+// POST /api/bodegas/crear - Crear nueva bodega
 // =============================================
 async function crearBodega(req, res) {
     try {

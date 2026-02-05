@@ -1,0 +1,182 @@
+<!-- ============================================= -->
+<!-- Componente: Bodegas (Dashboard) -->
+<!-- ============================================= -->
+
+<div class="dashboard-container">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <h1>Bodegas</h1>
+    <button class="btn-logout" (click)="logout()" title="Cerrar sesión">
+      <span>👤</span>
+    </button>
+  </header>
+
+  <!-- Panel de búsqueda -->
+  <div class="search-panel">
+    <h2>Consulta de Bodegas</h2>
+    <p class="search-description">Ingrese el ID de la bodega para buscar, o deje el campo vacío y presione Buscar para ver todas.</p>
+
+    <div class="search-controls">
+      <div class="search-input-wrapper">
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+          placeholder="Ingrese ID de Bodega..."
+          class="search-input"
+        >
+      </div>
+      <button class="btn-search" (click)="buscar()">Buscar</button>
+      <button class="btn-new" (click)="abrirModalNueva()">+ Nuevo</button>
+      
+      <!-- Toggle para mostrar inactivos -->
+      <label class="toggle-label">
+        <input 
+          type="checkbox" 
+          [(ngModel)]="mostrarInactivos"
+          (change)="onToggleInactivos()"
+        >
+        <span>Mostrar inactivos</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Tabla de bodegas -->
+  <div class="table-container" *ngIf="!isLoading">
+    <table class="bodegas-table">
+      <thead>
+        <tr>
+          <th>BODEGA</th>
+          <th>NOMBRE</th>
+          <th>DIRECCIÓN</th>
+          <th>TELÉFONOS</th>
+          <th>FAX</th>
+          <th>RESPONSABLE</th>
+          <th>VENDIBLE</th>
+          <th>ESTADO</th>
+          <th>ACCIONES</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let bodega of bodegasFiltradas">
+          <td>{{ bodega.IDBODEGA }}</td>
+          <td>{{ bodega.NOMBRE }}</td>
+          <td>{{ bodega.DIRECCION }}</td>
+          <td>{{ bodega.TELEFONOS }}</td>
+          <td>{{ bodega.FAX }}</td>
+          <td>{{ bodega.RESPONSABLE }}</td>
+          <td>
+            <span class="badge" [class.badge-si]="bodega.VENDIBLE === 'S'" [class.badge-no]="bodega.VENDIBLE === 'N'">
+              {{ bodega.VENDIBLE === 'S' ? 'Sí' : 'No' }}
+            </span>
+          </td>
+          <td>
+            <span class="badge" [class.badge-activo]="bodega.ESTADO === 'A'" [class.badge-inactivo]="bodega.ESTADO === 'I'">
+              {{ bodega.ESTADO === 'A' ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <button class="btn-action btn-edit" (click)="abrirModalEditar(bodega)" title="Editar">
+              ✏️ Editar
+            </button>
+            <button class="btn-action btn-delete" (click)="eliminarBodega(bodega)" title="Eliminar">
+              🗑️ Eliminar
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="bodegasFiltradas.length === 0">
+          <td colspan="9" class="no-data">No se encontraron bodegas</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading">Cargando...</div>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+</div>
+
+<!-- Modal Editar/Crear Bodega -->
+<div class="modal-overlay" *ngIf="showModal" (click)="cerrarModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ isEditMode ? 'Editar Bodega' : 'Nueva Bodega' }}</h3>
+      <button class="btn-close" (click)="cerrarModal()">×</button>
+    </div>
+
+    <p class="modal-subtitle">Modifique los campos necesarios y guarde los cambios.</p>
+
+    <div class="modal-body">
+      <div class="form-row">
+        <label>ID Bodega</label>
+        <input 
+          type="text" 
+          [(ngModel)]="bodegaActual.IDBODEGA"
+          [disabled]="isEditMode"
+          maxlength="5"
+        >
+      </div>
+
+      <div class="form-row">
+        <label>Nombre</label>
+        <input type="text" [(ngModel)]="bodegaActual.NOMBRE">
+      </div>
+
+      <div class="form-row">
+        <label>Dirección</label>
+        <input type="text" [(ngModel)]="bodegaActual.DIRECCION">
+      </div>
+
+      <div class="form-row">
+        <label>Teléfonos</label>
+        <input type="text" [(ngModel)]="bodegaActual.TELEFONOS">
+      </div>
+
+      <div class="form-row">
+        <label>Fax</label>
+        <input type="text" [(ngModel)]="bodegaActual.FAX">
+      </div>
+
+      <div class="form-row">
+        <label>Responsable</label>
+        <input type="text" [(ngModel)]="bodegaActual.RESPONSABLE">
+      </div>
+
+      <div class="form-row">
+        <label>Tipo</label>
+        <select [(ngModel)]="bodegaActual.TIPO">
+          <option value="P">Principal</option>
+          <option value="S">Secundaria</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <label>Serie Doc.</label>
+        <input type="text" [(ngModel)]="bodegaActual.SERIE_DOCUMENTOS">
+      </div>
+
+      <div class="form-row">
+        <label>Vendible</label>
+        <select [(ngModel)]="bodegaActual.VENDIBLE">
+          <option value="S">Sí</option>
+          <option value="N">No</option>
+        </select>
+      </div>
+
+      <div class="form-row" *ngIf="isEditMode">
+        <label>Estado</label>
+        <select [(ngModel)]="bodegaActual.ESTADO">
+          <option value="A">Activo</option>
+          <option value="I">Inactivo</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="cerrarModal()">Cancelar</button>
+      <button class="btn-primary" (click)="guardarBodega()">Guardar Cambios</button>
+    </div>
+  </div>
+</div>
