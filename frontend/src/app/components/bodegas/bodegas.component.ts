@@ -51,22 +51,21 @@ export class BodegasComponent implements OnInit {
       error: (error) => {
         this.errorMessage = 'Error al cargar bodegas';
         this.isLoading = false;
-        console.error(error);
       }
     });
   }
 
   filtrarBodegas(): void {
-    let resultado = this.bodegas;
+    let resultado = [...this.bodegas];
 
-    // Filtrar por estado
+    // Filtrar por estado (activos/inactivos)
     if (!this.mostrarInactivos) {
       resultado = resultado.filter(b => b.ESTADO === 'A');
     }
 
     // Filtrar por búsqueda
     if (this.searchTerm.trim()) {
-      const term = this.searchTerm.toLowerCase();
+      const term = this.searchTerm.toLowerCase().trim();
       resultado = resultado.filter(b => 
         b.IDBODEGA.toLowerCase().includes(term) ||
         b.NOMBRE.toLowerCase().includes(term)
@@ -111,11 +110,25 @@ export class BodegasComponent implements OnInit {
 
   guardarBodega(): void {
     const usuario = this.authService.getCurrentUser();
-    if (!usuario) return;
+    if (!usuario || !usuario.IDUSUARIO) {
+      alert('Error: No hay usuario autenticado');
+      return;
+    }
+
+    // Validaciones básicas
+    if (!this.bodegaActual.IDBODEGA || this.bodegaActual.IDBODEGA.trim() === '') {
+      alert('El ID de bodega es requerido');
+      return;
+    }
+
+    if (!this.bodegaActual.NOMBRE || this.bodegaActual.NOMBRE.trim() === '') {
+      alert('El nombre de la bodega es requerido');
+      return;
+    }
 
     const bodegaRequest: BodegaRequest = {
-      idBodega: this.bodegaActual.IDBODEGA || '',
-      nombre: this.bodegaActual.NOMBRE || '',
+      idBodega: this.bodegaActual.IDBODEGA.trim(),
+      nombre: this.bodegaActual.NOMBRE.trim(),
       direccion: this.bodegaActual.DIRECCION || '',
       telefonos: this.bodegaActual.TELEFONOS || '',
       fax: this.bodegaActual.FAX || '',
@@ -134,7 +147,8 @@ export class BodegasComponent implements OnInit {
           this.cargarBodegas();
         },
         error: (error) => {
-          alert('Error al actualizar: ' + (error.error?.message || error.message));
+          const errorMsg = error.error?.error || error.error?.message || error.message || 'Error desconocido';
+          alert('Error al actualizar: ' + errorMsg);
         }
       });
     } else {
@@ -145,7 +159,8 @@ export class BodegasComponent implements OnInit {
           this.cargarBodegas();
         },
         error: (error) => {
-          alert('Error al crear: ' + (error.error?.message || error.message));
+          const errorMsg = error.error?.error || error.error?.message || error.message || 'Error desconocido';
+          alert('Error al crear: ' + errorMsg);
         }
       });
     }
